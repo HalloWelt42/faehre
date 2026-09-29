@@ -1,0 +1,27 @@
+[project]
+name = "faehre"
+# Keine Versionsnummer hier: einzige Wahrheit ist version.json im Projektwurzelverzeichnis.
+dynamic = ["version"]
+description = "Fähre Backend - Dateiaustausch zwischen Mac und Android-Telefon"
+requires-python = ">=3.12"
+dependencies = [
+    "adbutils>=2.12.0",
+    "fastapi>=0.141.1",
+    "pydantic-settings>=2.15.0",
+    "send2trash>=2.1.0",
+    "sse-starlette>=3.5.0",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28",
+    "pytest>=9.1.1",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

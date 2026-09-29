@@ -1,0 +1,22 @@
+# Umgebung (Ports) - wird von tools/einrichten.sh erzeugt
+.env
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Node / Frontend
+node_modules/
+dist/
+.vite/
+
+# Laufzeit und Testdaten
+.run/
+.test-daten/
+
+# System
+.DS_Store
+.idea/
+*.egg-info/
