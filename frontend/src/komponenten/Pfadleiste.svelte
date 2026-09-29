@@ -16,6 +16,9 @@
     symbol: string | null;
   }
 
+  // Lange Pfade: Anfang, Auslassung und die letzten Stufen. Ein Klick auf die Auslassung zeigt alles.
+  const SICHTBARE_ENDSTUFEN = 2;
+  let aufgeklappt = $state(false);
   let bearbeiten = $state(false);
   let eingabe = $state('');
   let feld = $state<HTMLInputElement | null>(null);
@@ -42,6 +45,16 @@
       }),
     ];
   });
+
+  $effect(() => {
+    void pfad;
+    aufgeklappt = false;
+  });
+
+  const verkuerzt = $derived(!aufgeklappt && stufen.length > SICHTBARE_ENDSTUFEN + 2);
+  const sichtbar = $derived(
+    verkuerzt ? [stufen[0]!, null, ...stufen.slice(-SICHTBARE_ENDSTUFEN)] : stufen,
+  );
 
   async function beginneBearbeiten(): Promise<void> {
     eingabe = pfad;
@@ -74,12 +87,16 @@
     />
   {:else}
     <nav aria-label="Pfad">
-      {#each stufen as stufe, i (stufe.pfad)}
+      {#each sichtbar as stufe, i (stufe?.pfad ?? 'auslassung')}
         {#if i > 0}<i class="fa-solid fa-chevron-right trenner"></i>{/if}
-        <button class="stufe" class:letzte={i === stufen.length - 1} onclick={() => onoeffne(stufe.pfad)} title={stufe.pfad}>
-          {#if stufe.symbol}<i class="fa-solid fa-{stufe.symbol}"></i>{/if}
-          {#if stufe.name}<span>{stufe.name}</span>{/if}
-        </button>
+        {#if stufe === null}
+          <button class="stufe" onclick={() => (aufgeklappt = true)} title="Ganzen Pfad zeigen" aria-label="Ganzen Pfad zeigen"><i class="fa-solid fa-ellipsis"></i></button>
+        {:else}
+          <button class="stufe" class:letzte={i === sichtbar.length - 1} onclick={() => onoeffne(stufe.pfad)} title={stufe.pfad}>
+            {#if stufe.symbol}<i class="fa-solid fa-{stufe.symbol}"></i>{/if}
+            {#if stufe.name}<span>{stufe.name}</span>{/if}
+          </button>
+        {/if}
       {/each}
     </nav>
     <button class="symbolknopf" onclick={beginneBearbeiten} title="Pfad direkt eingeben und mit der Eingabetaste öffnen">
@@ -113,7 +130,8 @@
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    max-width: 16rem;
+    max-width: 12rem;
+    min-width: 0;
     padding: 0.2rem 0.45rem;
     border: 0;
     border-radius: var(--f-radius-klein);

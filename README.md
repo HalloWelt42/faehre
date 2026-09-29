@@ -2,6 +2,8 @@
 
 Dateiaustausch zwischen Mac und Android-Telefon im Browser. Zwei Ordnerseiten nebeneinander, Dateien per Drag & Drop hin- und herschieben, dazu Tastatursteuerung nach dem Vorbild klassischer Zwei-Fenster-Dateimanager.
 
+![Fähre: links der Mac, rechts das Telefon, unten eine laufende Übertragung](docs/bildschirm.jpg)
+
 ## Was Fähre kann
 
 - **Zwei Ordnerseiten**, jede zeigt wahlweise den Mac oder ein angeschlossenes Telefon

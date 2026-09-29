@@ -188,6 +188,7 @@
 
 <style>
   .liste {
+    container-type: inline-size;
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -360,5 +361,18 @@
 
   .auswahl {
     color: var(--f-akzent);
+  }
+
+  /* Schmale Seite: das Datum weicht, damit der Name lesbar bleibt. */
+  @container (max-width: 480px) {
+    .kopf,
+    .zeile {
+      grid-template-columns: minmax(0, 1fr) 5.5rem;
+    }
+
+    .spalte.geaendert,
+    .zeit {
+      display: none;
+    }
   }
 </style>
