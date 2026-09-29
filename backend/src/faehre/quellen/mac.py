@@ -55,9 +55,13 @@ class MacQuelle(Dateiquelle):
             ("Musik", heim / "Music", "music"),
             ("Filme", heim / "Movies", "film"),
         ]
-        orte = [Ort(name=name, pfad=str(pfad), symbol=symbol) for name, pfad, symbol in vorschlaege if pfad.is_dir()]
+        orte = [
+            Ort(name=name, pfad=str(pfad), symbol=symbol, anker=pfad == heim)
+            for name, pfad, symbol in vorschlaege
+            if pfad.is_dir()
+        ]
         orte += [
-            Ort(name=laufwerk.name, pfad=str(laufwerk), symbol="hard-drive")
+            Ort(name=laufwerk.name, pfad=str(laufwerk), symbol="hard-drive", anker=True)
             for laufwerk in sorted(Path("/Volumes").iterdir())
             if laufwerk.is_dir() and not laufwerk.is_symlink()
         ]

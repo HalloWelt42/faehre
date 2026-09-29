@@ -1,11 +1,12 @@
 """Einstiegspunkt: baut die Dienste zusammen und hängt die Routen ein."""
 
 import asyncio
-from collections.abc import AsyncIterator
+import logging
+from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 
 from adbutils import AdbError
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response
 from fastapi.responses import JSONResponse
 
 from faehre.abhaengigkeiten import Dienste
@@ -18,6 +19,10 @@ from faehre.quellen.mac import MacQuelle
 from faehre.quellen.register import Quellenregister
 from faehre.routen import auftraege, quellen, system
 from faehre.version import lies_version
+
+
+# Änderungen an Dateien stehen mit Pfad im Protokoll (.run/backend.log), damit sie nachvollziehbar bleiben.
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
 
 @asynccontextmanager
@@ -37,6 +42,17 @@ async def lebenszyklus(app: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(title="Fähre", version=lies_version().voll, lifespan=lebenszyklus)
+
+
+@app.middleware("http")
+async def ohne_zwischenspeicher(request: Request, weiter: Callable[[Request], Awaitable[Response]]) -> Response:
+    """Ordnerinhalte ändern sich laufend: kein Browser und kein Proxy darf API-Antworten aufheben."""
+    antwort = await weiter(request)
+    if request.url.path.startswith("/api/"):
+        antwort.headers["Cache-Control"] = "no-store"
+    return antwort
+
+
 app.include_router(system.router)
 app.include_router(quellen.router)
 app.include_router(auftraege.router)

@@ -1,5 +1,6 @@
 """Ordner ansehen, Dateien hoch- und herunterladen, anlegen, umbenennen, löschen."""
 
+import logging
 import mimetypes
 from collections.abc import Iterator
 from datetime import datetime
@@ -15,8 +16,10 @@ from faehre.dienste.ordner import ordnerseite
 from faehre.modelle import (
     Eintrag,
     Eintragsart,
+    KonfliktPruefung,
     LoeschErgebnis,
     Loeschen,
+    NamensPruefung,
     Ordnerseite,
     OrdnerAnlegen,
     Quellenstand,
@@ -25,6 +28,7 @@ from faehre.modelle import (
 )
 from faehre.quellen.basis import NichtGefunden, QuellenFehler, dateiname, elternordner, pruefe_name, verbinde
 
+log = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/quellen", tags=["Quellen"])
 DiensteAbh = Annotated[Dienste, Depends(dienste)]
 
@@ -54,6 +58,13 @@ def ordner(
     return ordnerseite(quelle, pfad, ab, d.einstellungen.seitengroesse, sortierung, absteigend, versteckte)
 
 
+@router.post("/{kennung}/vorhanden", response_model=KonfliktPruefung)
+def vorhanden(kennung: str, anfrage: NamensPruefung, d: DiensteAbh) -> KonfliktPruefung:
+    """Vor dem Hochladen: Welche Namen würden überschrieben?"""
+    quelle = d.register.hole(kennung)
+    return KonfliktPruefung(vorhanden=quelle.vorhandene_namen(anfrage.ordner, anfrage.namen))
+
+
 @router.post("/{kennung}/ordner-anlegen", response_model=Eintrag)
 def ordner_anlegen(kennung: str, anfrage: OrdnerAnlegen, d: DiensteAbh) -> Eintrag:
     quelle = d.register.hole(kennung)
@@ -61,6 +72,7 @@ def ordner_anlegen(kennung: str, anfrage: OrdnerAnlegen, d: DiensteAbh) -> Eintr
     if quelle.eintrag(pfad) is not None:
         raise QuellenFehler(f"{dateiname(pfad)} gibt es hier schon.")
     quelle.ordner_anlegen(pfad)
+    log.info("Ordner angelegt auf %s: %s", kennung, pfad)
     return _eintrag_oder_fehler(quelle.eintrag(pfad), pfad)
 
 
@@ -72,6 +84,7 @@ def umbenennen(kennung: str, anfrage: Umbenennen, d: DiensteAbh) -> Eintrag:
         raise QuellenFehler("Der oberste Ordner lässt sich nicht umbenennen.")
     neuer_pfad = verbinde(eltern, pruefe_name(anfrage.neuer_name))
     quelle.benenne_um(anfrage.pfad, neuer_pfad)
+    log.info("Umbenannt auf %s: %s -> %s", kennung, anfrage.pfad, neuer_pfad)
     return _eintrag_oder_fehler(quelle.eintrag(neuer_pfad), neuer_pfad)
 
 
@@ -80,6 +93,7 @@ def loeschen(kennung: str, anfrage: Loeschen, d: DiensteAbh) -> LoeschErgebnis:
     quelle = d.register.hole(kennung)
     for pfad in anfrage.pfade:
         quelle.loesche(pfad)
+        log.info("Gelöscht auf %s (Papierkorb: %s): %s", kennung, quelle.loeschen_in_papierkorb, pfad)
     return LoeschErgebnis(geloescht=len(anfrage.pfade), in_papierkorb=quelle.loeschen_in_papierkorb)
 
 
@@ -95,6 +109,7 @@ async def hochladen(
     quelle = d.register.hole(kennung)
     zeitpunkt = datetime.fromtimestamp(geaendert / 1000) if geaendert else None
     await verarbeite_strom(request.stream(), lambda bloecke: quelle.schreibe(pfad, bloecke, zeitpunkt))
+    log.info("Hochgeladen auf %s: %s", kennung, pfad)
     return _eintrag_oder_fehler(quelle.eintrag(pfad), pfad)
 
 

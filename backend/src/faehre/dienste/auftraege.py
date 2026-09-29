@@ -61,12 +61,8 @@ class Auftragsdienst:
 
     def pruefe(self, anfrage: AuftragsAnfrage) -> KonfliktPruefung:
         ziel = self._register.hole(anfrage.ziel_quelle)
-        vorhanden = [
-            dateiname(pfad)
-            for pfad in anfrage.pfade
-            if ziel.eintrag(verbinde(anfrage.ziel_ordner, dateiname(pfad))) is not None
-        ]
-        return KonfliktPruefung(vorhanden=vorhanden)
+        namen = [dateiname(pfad) for pfad in anfrage.pfade]
+        return KonfliktPruefung(vorhanden=ziel.vorhandene_namen(anfrage.ziel_ordner, namen))
 
     def lege_an(self, anfrage: AuftragsAnfrage) -> Auftrag:
         self._pruefe_ziel_nicht_in_quelle(anfrage)
@@ -82,6 +78,10 @@ class Auftragsdienst:
         )
         with self._sperre:
             self._auftraege[auftrag.kennung] = auftrag
+        log.info(
+            "Auftrag %s: %s von %s %s nach %s:%s",
+            auftrag.kennung, auftrag.art, auftrag.quelle, auftrag.pfade, auftrag.ziel_quelle, auftrag.ziel_ordner,
+        )
         self._melde(auftrag)
         self._ausfuehrer.submit(self._fuehre_aus, auftrag.kennung, anfrage.bei_vorhanden)
         return auftrag
@@ -141,6 +141,7 @@ class Auftragsdienst:
             neuer_pfad = verbinde(auftrag.ziel_ordner, dateiname(pfad))
             self._aendere(auftrag, aktuelle_datei=dateiname(pfad))
             if quelle.eintrag(neuer_pfad) is not None:
+                log.info("Auftrag %s ersetzt %s", auftrag.kennung, neuer_pfad)
                 quelle.loesche(neuer_pfad)
             quelle.benenne_um(pfad, neuer_pfad)
             self._aendere(auftrag, dateien_fertig=auftrag.dateien_fertig + 1)
@@ -164,6 +165,7 @@ class Auftragsdienst:
             self._aendere(auftrag, dateien_fertig=auftrag.dateien_fertig + 1)
         if auftrag.art == Auftragsart.VERSCHIEBEN:
             for pfad in pfade:
+                log.info("Auftrag %s entfernt verschobene Quelle %s", auftrag.kennung, pfad)
                 quelle.loesche(pfad)
 
     def _plane(self, quelle: Dateiquelle, pfad: str, ziel: str) -> Iterator[Kopierschritt]:

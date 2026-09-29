@@ -46,7 +46,7 @@ class AndroidQuelle(Dateiquelle):
         return self._start
 
     def orte(self) -> list[Ort]:
-        orte = [Ort(name="Interner Speicher", pfad="/sdcard", symbol="mobile-screen")]
+        orte = [Ort(name="Interner Speicher", pfad="/sdcard", symbol="mobile-screen", anker=True)]
         vorhandene = {e.name for e in self._liste_roh("/sdcard") if e.ist_ordner}
         orte += [
             Ort(name=name, pfad=verbinde("/sdcard", name), symbol=symbol)
@@ -54,7 +54,7 @@ class AndroidQuelle(Dateiquelle):
             if name in vorhandene
         ]
         orte += [
-            Ort(name="SD-Karte", pfad=verbinde("/storage", e.name), symbol="sd-card")
+            Ort(name="SD-Karte", pfad=verbinde("/storage", e.name), symbol="sd-card", anker=True)
             for e in self._liste_roh("/storage")
             if e.name not in ("emulated", "self") and e.ist_ordner
         ]

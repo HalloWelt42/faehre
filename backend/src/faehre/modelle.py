@@ -45,6 +45,8 @@ class Ort(BaseModel):
     name: str
     pfad: str
     symbol: str
+    # Anker ersetzen in der Pfadleiste den Pfadanfang, etwa "SD-Karte" statt /storage/3039-6133.
+    anker: bool = False
 
 
 class Quellenart(StrEnum):
@@ -98,6 +100,13 @@ class AuftragsAnfrage(BaseModel):
     ziel_quelle: str
     ziel_ordner: str
     bei_vorhanden: BeiVorhanden = BeiVorhanden.UEBERSCHREIBEN
+
+
+class NamensPruefung(BaseModel):
+    """Welche dieser Namen gibt es im Ordner schon?"""
+
+    ordner: str
+    namen: list[str]
 
 
 class KonfliktPruefung(BaseModel):

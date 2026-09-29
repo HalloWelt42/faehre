@@ -97,6 +97,9 @@ class Dateiquelle(ABC):
     def loeschen_in_papierkorb(self) -> bool:
         """True, wenn Löschen rückgängig zu machen ist."""
 
+    def vorhandene_namen(self, ordner: str, namen: list[str]) -> list[str]:
+        return [name for name in namen if self.eintrag(verbinde(ordner, name)) is not None]
+
     def beschreibung(self) -> Quelle:
         return Quelle(
             kennung=self.kennung,

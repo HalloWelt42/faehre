@@ -1,0 +1,156 @@
+/* Farben und Maße an einer Stelle. Dunkel ist Standard, hell folgt der Systemeinstellung. */
+:root {
+  --f-hintergrund: #0e131a;
+  --f-flaeche: #151c26;
+  --f-flaeche-2: #1c2531;
+  --f-flaeche-3: #243041;
+  --f-linie: #263243;
+  --f-text: #e5eaf1;
+  --f-text-leise: #8a97a9;
+  --f-akzent: #4fb3ff;
+  --f-akzent-text: #06121d;
+  --f-akzent-weich: rgba(79, 179, 255, 0.14);
+  --f-markiert: rgba(79, 179, 255, 0.24);
+  --f-gefahr: #ff6b6b;
+  --f-gefahr-weich: rgba(255, 107, 107, 0.14);
+  --f-erfolg: #3ecf8e;
+  --f-warnung: #f5b94a;
+  --f-schatten: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --f-radius: 10px;
+  --f-radius-klein: 6px;
+  --f-schrift: 'Barlow', system-ui, sans-serif;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --f-hintergrund: #eef1f5;
+    --f-flaeche: #ffffff;
+    --f-flaeche-2: #f4f6f9;
+    --f-flaeche-3: #e7ecf2;
+    --f-linie: #dde3eb;
+    --f-text: #18212d;
+    --f-text-leise: #5f6b7c;
+    --f-akzent: #1f8fe6;
+    --f-akzent-text: #ffffff;
+    --f-akzent-weich: rgba(31, 143, 230, 0.1);
+    --f-markiert: rgba(31, 143, 230, 0.18);
+    --f-gefahr: #d64545;
+    --f-gefahr-weich: rgba(214, 69, 69, 0.1);
+    --f-erfolg: #1f9d63;
+    --f-warnung: #c98a10;
+    --f-schatten: 0 10px 30px rgba(20, 30, 45, 0.15);
+    color-scheme: light;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--f-hintergrund);
+  color: var(--f-text);
+  font-family: var(--f-schrift);
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  height: 100%;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.knopf {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid transparent;
+  border-radius: var(--f-radius-klein);
+  background: var(--f-flaeche-3);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.knopf:hover {
+  background: var(--f-linie);
+}
+
+.knopf:focus-visible,
+.symbolknopf:focus-visible {
+  outline: 2px solid var(--f-akzent);
+  outline-offset: 1px;
+}
+
+.knopf.haupt {
+  background: var(--f-akzent);
+  color: var(--f-akzent-text);
+}
+
+.knopf.gefahr {
+  background: var(--f-gefahr);
+  color: #fff;
+}
+
+.knopf:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.symbolknopf {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  border-radius: var(--f-radius-klein);
+  background: transparent;
+  color: var(--f-text-leise);
+}
+
+.symbolknopf:hover {
+  background: var(--f-flaeche-3);
+  color: var(--f-text);
+}
+
+.symbolknopf.an {
+  color: var(--f-akzent);
+  background: var(--f-akzent-weich);
+}
+
+/* Beschriftung beim Ziehen, siehe lib/ziehen.ts */
+.zugbild {
+  position: fixed;
+  top: -100px;
+  left: -100px;
+  padding: 0.35rem 0.7rem;
+  border-radius: var(--f-radius-klein);
+  background: var(--f-akzent);
+  color: var(--f-akzent-text);
+  font-family: var(--f-schrift);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--f-flaeche-3);
+  border-radius: 10px;
+  border: 2px solid var(--f-flaeche);
+}
