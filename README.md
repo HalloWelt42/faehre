@@ -10,13 +10,14 @@ Dateiaustausch zwischen Mac und Android-Telefon im Browser. Zwei Ordnerseiten ne
 - **Drag & Drop** zwischen den Seiten (kopieren, mit gedrückter ⌘-Taste verschieben), auf Ordner in der Liste und aus dem Finder hinein, auch ganze Ordner
 - **Einzelne Dateien in den Finder ziehen** (Chromium-Browser)
 - **Rechtsklick-Menü** auf Dateien, Ordner und freie Fläche
-- **Übertragungen im Hintergrund** mit Fortschritt, Tempo, Restzeit und Abbrechen
+- **Übertragungen im Hintergrund** mit Fortschritt, Tempo, Restzeit und Abbrechen; ab vier Übertragungen fasst eine Sammelzeile alles zusammen
 - **Rückfrage bei vorhandenen Namen**: überschreiben oder überspringen
 - **Änderungsdatum bleibt erhalten**, in beide Richtungen
 - **Löschen auf dem Mac in den Papierkorb**; auf dem Telefon endgültig, mit deutlichem Hinweis
 - **SD-Karte** und wichtige Ordner über den Schnellzugriff (Stern)
 - **Neue Bilder und Musik** erscheinen sofort in Galerie und Player des Telefons
 - **Große Ordner** werden seitenweise beim Rollen nachgeladen
+- **Helles und dunkles Thema** per Schalter in der Fußleiste, ohne Wahl gilt die Systemeinstellung
 - **Geräteerkennung**: das Telefon erscheint beim Einstecken von selbst, fehlende Freigaben werden angezeigt
 
 ## Einrichtung

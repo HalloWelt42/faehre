@@ -9,6 +9,7 @@
 </script>
 
 <script lang="ts">
+  import { thema } from '../lib/thema.svelte';
   import { verbindung } from '../lib/verbindung.svelte';
 
   interface Props {
@@ -34,6 +35,14 @@
       <i class="fa-solid fa-circle"></i>
       {verbindung.verbunden ? 'verbunden' : 'getrennt'}
     </span>
+    <button
+      class="symbolknopf"
+      onclick={() => thema.umschalten()}
+      title={thema.aktuell === 'hell' ? 'Zum dunklen Thema wechseln' : 'Zum hellen Thema wechseln'}
+      aria-label="Thema wechseln"
+    >
+      <i class="fa-solid {thema.aktuell === 'hell' ? 'fa-moon' : 'fa-sun'}"></i>
+    </button>
     <span class="marke"><i class="fa-solid fa-ferry"></i> Fähre {version}</span>
   </div>
 </footer>

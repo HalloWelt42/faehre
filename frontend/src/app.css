@@ -1,4 +1,4 @@
-/* Farben und Maße an einer Stelle. Dunkel ist Standard, hell folgt der Systemeinstellung. */
+/* Farben und Maße an einer Stelle. Das Thema setzt lib/thema.svelte.ts als data-thema auf <html>. */
 :root {
   --f-hintergrund: #0e131a;
   --f-flaeche: #151c26;
@@ -22,26 +22,24 @@
   color-scheme: dark;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --f-hintergrund: #eef1f5;
-    --f-flaeche: #ffffff;
-    --f-flaeche-2: #f4f6f9;
-    --f-flaeche-3: #e7ecf2;
-    --f-linie: #dde3eb;
-    --f-text: #18212d;
-    --f-text-leise: #5f6b7c;
-    --f-akzent: #1f8fe6;
-    --f-akzent-text: #ffffff;
-    --f-akzent-weich: rgba(31, 143, 230, 0.1);
-    --f-markiert: rgba(31, 143, 230, 0.18);
-    --f-gefahr: #d64545;
-    --f-gefahr-weich: rgba(214, 69, 69, 0.1);
-    --f-erfolg: #1f9d63;
-    --f-warnung: #c98a10;
-    --f-schatten: 0 10px 30px rgba(20, 30, 45, 0.15);
-    color-scheme: light;
-  }
+:root[data-thema='hell'] {
+  --f-hintergrund: #eef1f5;
+  --f-flaeche: #ffffff;
+  --f-flaeche-2: #f4f6f9;
+  --f-flaeche-3: #e7ecf2;
+  --f-linie: #dde3eb;
+  --f-text: #18212d;
+  --f-text-leise: #5f6b7c;
+  --f-akzent: #1f8fe6;
+  --f-akzent-text: #ffffff;
+  --f-akzent-weich: rgba(31, 143, 230, 0.1);
+  --f-markiert: rgba(31, 143, 230, 0.18);
+  --f-gefahr: #d64545;
+  --f-gefahr-weich: rgba(214, 69, 69, 0.1);
+  --f-erfolg: #1f9d63;
+  --f-warnung: #c98a10;
+  --f-schatten: 0 10px 30px rgba(20, 30, 45, 0.15);
+  color-scheme: light;
 }
 
 *,

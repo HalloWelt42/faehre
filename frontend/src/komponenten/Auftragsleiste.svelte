@@ -59,6 +59,40 @@
 
   const hatErledigte = $derived(anzeigen.some((a) => ABGESCHLOSSEN.includes(a.status)));
 
+  // Ab mehr als drei Übertragungen reicht eine Sammelzeile; die Einzelliste lässt sich aufklappen.
+  const MAX_EINZELN = 3;
+  let aufgeklappt = $state(false);
+  const zusammengefasst = $derived(anzeigen.length > MAX_EINZELN && !aufgeklappt);
+
+  const sammel = $derived.by(() => {
+    const zaehle = (status: Auftragsstatus): number => anzeigen.filter((a) => a.status === status).length;
+    const laufend = anzeigen.find((a) => a.status === 'laeuft') ?? null;
+    return {
+      laufend,
+      laeuft: zaehle('laeuft'),
+      wartet: zaehle('wartet'),
+      fertig: zaehle('fertig'),
+      fehler: zaehle('fehler') + zaehle('abgebrochen'),
+      bytesFertig: anzeigen.reduce((summe, a) => summe + a.bytesFertig, 0),
+      bytesGesamt: anzeigen.reduce((summe, a) => summe + a.bytesGesamt, 0),
+    };
+  });
+
+  const sammelText = $derived(
+    [
+      sammel.laeuft > 0 ? `${sammel.laeuft} läuft` : '',
+      sammel.wartet > 0 ? `${sammel.wartet} ${sammel.wartet === 1 ? 'wartet' : 'warten'}` : '',
+      sammel.fertig > 0 ? `${sammel.fertig} fertig` : '',
+      sammel.fehler > 0 ? `${sammel.fehler} nicht erledigt` : '',
+    ]
+      .filter(Boolean)
+      .join(', '),
+  );
+
+  function brichAlleAb(): void {
+    anzeigen.filter((a) => a.status === 'laeuft' || a.status === 'wartet').forEach((a) => a.abbrechen());
+  }
+
   function anteil(a: Anzeige): number {
     if (a.bytesGesamt > 0) return Math.min(100, (a.bytesFertig / a.bytesGesamt) * 100);
     if (a.dateienGesamt > 0) return (a.dateienFertig / a.dateienGesamt) * 100;
@@ -106,6 +140,31 @@
 
 {#if anzeigen.length > 0}
   <section class="leiste" aria-label="Übertragungen">
+    {#if zusammengefasst}
+      <div class="eintraege">
+        <div class="auftrag {sammel.laufend ? 'laeuft' : sammel.fehler > 0 ? 'fehler' : 'fertig'}">
+          <i class="fa-solid fa-layer-group art"></i>
+          <div class="mitte">
+            <div class="zeile">
+              <strong>{anzahl(anzeigen.length, 'Übertragung', 'Übertragungen')}: {sammelText}</strong>
+              <span class="zahlen">{groesse(sammel.bytesFertig)} von {groesse(sammel.bytesGesamt)}</span>
+            </div>
+            <div class="balken">
+              <div style:width="{sammel.bytesGesamt > 0 ? Math.min(100, (sammel.bytesFertig / sammel.bytesGesamt) * 100) : 0}%"></div>
+            </div>
+            <div class="zeile leise">
+              <span class="datei">{sammel.laufend?.aktuelleDatei ?? ''}</span>
+              <span>{sammel.laufend ? tempo(sammel.laufend) : ''}</span>
+            </div>
+          </div>
+          {#if sammel.laeuft + sammel.wartet > 0}
+            <button class="symbolknopf" onclick={brichAlleAb} title="Alle laufenden und wartenden Übertragungen abbrechen. Bereits übertragene Dateien bleiben erhalten.">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          {/if}
+        </div>
+      </div>
+    {:else}
     <div class="eintraege">
       {#each anzeigen as a (a.kennung)}
         <div class="auftrag {a.status}">
@@ -136,6 +195,12 @@
         </div>
       {/each}
     </div>
+    {/if}
+    {#if anzeigen.length > MAX_EINZELN}
+      <button class="symbolknopf" onclick={() => (aufgeklappt = !aufgeklappt)} title={aufgeklappt ? 'Übertragungen zusammenfassen' : 'Alle Übertragungen einzeln zeigen'}>
+        <i class="fa-solid {aufgeklappt ? 'fa-chevron-down' : 'fa-chevron-up'}"></i>
+      </button>
+    {/if}
     {#if hatErledigte}
       <button class="knopf aufraeumen" onclick={raeumeAuf} title="Abgeschlossene Übertragungen aus der Liste entfernen">
         <i class="fa-solid fa-broom"></i> Erledigte entfernen
@@ -159,7 +224,8 @@
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
-    max-height: 11rem;
+    /* höchstens drei Zeilen, der Rest rollt */
+    max-height: 10.5rem;
     overflow-y: auto;
     overflow-x: clip;
     min-width: 0;

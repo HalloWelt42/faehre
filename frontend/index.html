@@ -4,6 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fähre</title>
+    <script>
+      // Thema vor dem ersten Zeichnen setzen, sonst blitzt kurz das falsche auf (siehe src/lib/thema.svelte.ts).
+      try {
+        const wahl = localStorage.getItem('faehre.thema');
+        document.documentElement.dataset.thema =
+          wahl === 'hell' || wahl === 'dunkel' ? wahl : matchMedia('(prefers-color-scheme: light)').matches ? 'hell' : 'dunkel';
+      } catch {}
+    </script>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   </head>
   <body>
