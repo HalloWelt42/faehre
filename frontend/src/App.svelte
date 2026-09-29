@@ -61,11 +61,17 @@
         waehleVorgabe(seite, name);
         const quelle = quellen.find((q) => q.kennung === seite.quelle);
         const verfuegbar = quelle !== undefined;
-        if (quelle && !zuletztVerfuegbar[name]) void seite.oeffne(seite.quelle, seite.pfad || quelle.start);
+        if (quelle && !zuletztVerfuegbar[name]) void oeffneGemerkt(seite, quelle.start);
         zuletztVerfuegbar[name] = verfuegbar;
       }
     });
   });
+
+  /** Der gemerkte Ordner kann inzwischen fehlen, dann gilt der Startordner der Quelle. */
+  async function oeffneGemerkt(seite: OrdnerseitenZustand, start: string): Promise<void> {
+    await seite.oeffne(seite.quelle, seite.pfad || start);
+    if (seite.fehler && seite.pfad !== start) await seite.oeffne(seite.quelle, start);
+  }
 
   /** Links startet der Mac, rechts das erste Telefon, sobald es eines gibt. */
   function waehleVorgabe(seite: OrdnerseitenZustand, name: Seitenname): void {

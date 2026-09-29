@@ -98,6 +98,8 @@ export class OrdnerseitenZustand {
       if (lauf !== this.ladelauf) return;
       this.eintraege = [];
       this.gesamt = 0;
+      // Auch ohne Antwort soll der Weg nach oben offen bleiben.
+      this.eltern = this.pfad === '/' ? null : this.pfad.replace(/\/+$/, '').replace(/\/[^/]*$/, '') || '/';
       this.fehler = fehler instanceof Error ? fehler.message : String(fehler);
     } finally {
       if (lauf === this.ladelauf) this.laedt = false;
